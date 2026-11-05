@@ -8,14 +8,16 @@
     <!-- Casting's audio capture asks for the microphone permission; TVs need not have one. -->
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
-    <!-- Music on the TV's own storage and on USB drives, read through the media library. -->
+    <!-- Music on the TV's own storage and on USB drives, read through media library or direct storage scan. -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
 
     <application
         android:label="FireTheDJ TV"
         tools:replace="android:label"
-        android:banner="@drawable/tv_banner">
+        android:banner="@drawable/tv_banner"
+        android:requestLegacyExternalStorage="true">
         <activity
             android:name=".tv.TvActivity"
             android:exported="true"
