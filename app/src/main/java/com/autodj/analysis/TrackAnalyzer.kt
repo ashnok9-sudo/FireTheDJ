@@ -92,6 +92,6 @@ object TrackAnalyzer {
         } catch (_: Exception) {
             // Permission revoked or file gone; the analysis step will report it.
         }
-        return uri.lastPathSegment ?: "Unknown"
+        return uri.lastPathSegment?.substringBeforeLast('.') ?: "Unknown"
     }
 }
