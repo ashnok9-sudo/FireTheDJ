@@ -157,7 +157,7 @@ If nothing happens, open the link in Chrome rather than the GitHub app, and tap 
 |---|---|
 | Android 8.0+ | the apps |
 | Android 10+ | casting the mix to a Chromecast |
-| Android 13+ | YouTube Music streaming |
+| Android 8.0+ | YouTube Music streaming (desugared) |
 
 <h2 id="install">Install</h2>
 
