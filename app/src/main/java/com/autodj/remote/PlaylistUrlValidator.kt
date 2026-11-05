@@ -17,9 +17,8 @@ sealed interface UrlCheck {
 class PlaylistUrlValidator(private val providers: List<StreamProvider>) {
     fun check(raw: String): UrlCheck {
         // Extract URL if surrounded by share text or extra whitespace
-        val extracted = Regex("""https?://[^\s<>"]+""").find(raw)?.value ?: raw.trim()
-        if (extracted.isEmpty()) return UrlCheck.Invalid("Paste a playlist link")
-        val text = if (extracted.startsWith("http://", ignoreCase = true)) "https://" + extracted.substring(7) else extracted
+        val text = Regex("""https?://[^\s<>"]+""").find(raw)?.value ?: raw.trim()
+        if (text.isEmpty()) return UrlCheck.Invalid("Paste a playlist link")
         val uri = try {
             URI(text)
         } catch (_: URISyntaxException) {
