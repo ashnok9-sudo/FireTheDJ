@@ -36,7 +36,7 @@ class YouTubeMusicProvider(private val browse: YtMusicBrowse = YtMusicBrowse()) 
     override val id = "youtube"
     override val displayName = "YouTube Music"
     override val urlRule = PlaylistUrlRule(
-        hosts = setOf("music.youtube.com", "youtube.com", "m.youtube.com"),
+        hosts = setOf("music.youtube.com", "youtube.com", "m.youtube.com", "youtu.be"),
         idParam = "list",
         idPattern = Regex("""[A-Za-z0-9_\-]{2,64}"""),
     )
@@ -195,13 +195,13 @@ object YouTubeStreams {
 
     private val init by lazy { NewPipe.init(NewPipeDownloader(), Localization.DEFAULT) }
 
-    /**
-     * NewPipe 0.26 encodes URLs with `URLEncoder.encode(String, Charset)`, which Android only
-     * has from 13 on; below that it fails with an Error that would take the app down.
-     */
+    /** Initializes NewPipe with desugaring support for older Android releases. */
     fun requireSupported() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) throw IOException("YouTube Music needs Android 13 or newer")
-        init
+        try {
+            init
+        } catch (e: LinkageError) {
+            throw IOException("YouTube engine cannot start on this device: ${e.message}", e)
+        }
     }
 
     /** Blocking; run off the main thread. Throws with a reason worth showing. */
@@ -386,7 +386,7 @@ private class NewPipeDownloader : Downloader() {
 
 /** YouTube Music's own search, for playlists: anything public there, people's own playlists too. */
 object YtMusicSearch {
-    /** Blocking; run off the main thread. Needs Android 13 (see [YouTubeStreams.requireSupported]). */
+    /** Blocking; run off the main thread. Initializes YouTube engine. */
     fun playlists(query: String, max: Int = 20): List<YtPlaylistCard> {
         YouTubeStreams.requireSupported()
         val search = ServiceList.YouTube.getSearchExtractor(query, listOf(YoutubeSearchQueryHandlerFactory.MUSIC_PLAYLISTS), "")
