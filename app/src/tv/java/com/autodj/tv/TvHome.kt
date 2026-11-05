@@ -60,6 +60,7 @@ import com.autodj.ui.DjViewModel
 import com.autodj.ui.FireTheDjWordmark
 import com.autodj.ui.Glass
 import com.autodj.ui.GlassSegmented
+import com.autodj.ui.MusicFolder
 import com.autodj.ui.SourceGlyph
 import com.autodj.ui.SourceKind
 import com.autodj.ui.glass
@@ -79,11 +80,13 @@ fun TvHome(vm: DjViewModel, onWatch: () -> Unit, onYtMusic: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val library by vm.library.collectAsStateWithLifecycle()
+    val folders by vm.folders.collectAsStateWithLifecycle()
     val mode by vm.mode.collectAsStateWithLifecycle()
     val state by vm.engine.state.collectAsStateWithLifecycle()
     var scanNote by remember { mutableStateOf<String?>(null) }
     var settings by remember { mutableStateOf(false) }
     var confirmClear by remember { mutableStateOf(false) }
+    var folderToRemove by remember { mutableStateOf<MusicFolder?>(null) }
 
     var support by remember { mutableStateOf(false) }
     val updateState by Updates.state.collectAsStateWithLifecycle()
@@ -112,6 +115,20 @@ fun TvHome(vm: DjViewModel, onWatch: () -> Unit, onYtMusic: () -> Unit) {
                 confirmClear = false
                 vm.clearLibrary()
                 scanNote = "Library cleared."
+            }
+        }
+    }
+    folderToRemove?.let { folder ->
+        GlassDialog(
+            "Remove playlist?",
+            "Remove \"${folder.name}\" (${songs(folder.tracks.size)}) from your library?",
+            onDismiss = { folderToRemove = null },
+        ) { first ->
+            TvCard("Cancel", null, Modifier.width(200.dp).focusRequester(first)) { folderToRemove = null }
+            TvCard("Remove", null, Modifier.width(200.dp), titleColor = Dj.Warn) {
+                vm.removeFolder(folder.uri)
+                folderToRemove = null
+                scanNote = "Removed \"${folder.name}\"."
             }
         }
     }
@@ -196,7 +213,7 @@ fun TvHome(vm: DjViewModel, onWatch: () -> Unit, onYtMusic: () -> Unit) {
                 if (crates.isEmpty()) {
                     Text(
                         if (library.isEmpty()) "Add music below to start: songs on this TV or a USB drive, or YT Music playlists."
-                        else "Analysing your songs. Crates appear here as soon as tracks are ready.",
+                        else "Analysing your songs ($analysing remaining). Crates appear here as soon as tracks are ready.",
                         color = Glass.Muted, fontSize = 16.sp, modifier = Modifier.padding(start = EDGE, top = 4.dp, bottom = 12.dp),
                     )
                 } else {
@@ -210,6 +227,60 @@ fun TvHome(vm: DjViewModel, onWatch: () -> Unit, onYtMusic: () -> Unit) {
                                 subtitle = if (crate == ALL) "${songs(count)} · across genres" else songs(count),
                                 modifier = Modifier.width(230.dp).height(116.dp).then(focus),
                             ) { vm.startSet(crate) }
+                        }
+                    }
+                }
+            }
+
+            if (folders.isNotEmpty()) {
+                Column(Modifier.tourTarget("tv_playlists"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        "Playlists & Sources",
+                        color = Glass.Text,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = (-0.6).sp,
+                        modifier = Modifier.padding(start = EDGE, top = 8.dp),
+                    )
+                    Text(
+                        "Select a playlist to mix exclusively from it.",
+                        color = Glass.Muted,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(start = EDGE),
+                    )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        contentPadding = PaddingValues(vertical = 14.dp, horizontal = EDGE),
+                    ) {
+                        items(folders, key = { it.uri }) { folder ->
+                            val totalTracks = folder.tracks.size
+                            val readyCount = library.count { it.uri in folder.tracks && it.info != null && it.info?.genreFamily != Genres.UNCLASSIFIED }
+                            val sub = when {
+                                totalTracks == 0 -> "Empty"
+                                readyCount == totalTracks -> "${songs(totalTracks)} · Ready to mix"
+                                readyCount > 0 -> "${songs(totalTracks)} · $readyCount ready"
+                                else -> "${songs(totalTracks)} · Analysing…"
+                            }
+                            val sourceKind = when {
+                                folder.uri.contains("spotify", ignoreCase = true) -> SourceKind.SPOTIFY
+                                folder.uri.contains("apple", ignoreCase = true) -> SourceKind.APPLE_MUSIC
+                                folder.remote -> SourceKind.STREAM
+                                else -> SourceKind.PHONE
+                            }
+                            TvCard(
+                                title = folder.name,
+                                subtitle = sub,
+                                modifier = Modifier.width(260.dp).height(116.dp),
+                                accent = sourceKind.color,
+                                icon = { SourceGlyph(sourceKind, 28.dp) },
+                                onClick = {
+                                    if (readyCount > 0) {
+                                        vm.startSet(ALL, source = folder.uri)
+                                    } else {
+                                        scanNote = "\"${folder.name}\" tracks are still analysing. Mix will start once ready."
+                                    }
+                                },
+                            )
                         }
                     }
                 }
