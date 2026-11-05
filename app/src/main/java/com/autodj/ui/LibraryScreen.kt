@@ -64,6 +64,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -624,6 +625,7 @@ private fun TrackRow(item: LibraryItem, art: String?, shape: Shape, onRemove: (S
 @Composable
 internal fun ImportDialog(youTube: Boolean, state: ImportState, onImport: (String) -> Unit, onClose: () -> Unit) {
     var link by rememberSaveable { mutableStateOf("") }
+    val clipboard = LocalClipboardManager.current
     val working = state == ImportState.Working
     val submit = { if (link.isNotBlank() && !working) onImport(link.trim()) }
     AlertDialog(
@@ -648,6 +650,17 @@ internal fun ImportDialog(youTube: Boolean, state: ImportState, onImport: (Strin
                     singleLine = true,
                     enabled = !working && state !is ImportState.Done,
                     placeholder = { Text(if (youTube) "https://music.youtube.com/playlist?list=…" else "https://open.spotify.com/playlist/…") },
+                    trailingIcon = {
+                        TextButton(
+                            onClick = {
+                                val clip = clipboard.getText()?.text?.trim()
+                                if (!clip.isNullOrBlank()) link = clip
+                            },
+                            enabled = !working && state !is ImportState.Done,
+                        ) {
+                            Text("Paste", color = Dj.Accent, fontSize = 12.sp)
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
                     keyboardActions = KeyboardActions(onGo = { submit() }),
                     modifier = Modifier.fillMaxWidth(),
