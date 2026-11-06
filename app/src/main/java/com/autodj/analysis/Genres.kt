@@ -11,6 +11,8 @@ object Genres {
     const val DNB = "Drum & Bass"
     const val BASS = "Dubstep & Bass"
     const val HIPHOP = "Hip-Hop"
+    const val AMAPIANO = "Amapiano"
+    const val GOSPEL = "Gospel"
     const val LATIN = "Latin"
     const val CHILL = "Chill"
     const val ROCK = "Rock"
@@ -35,7 +37,9 @@ object Genres {
         DNB to listOf("drum & bass", "drum and bass", "drum n bass", "drum'n'bass", "dnb", "jungle", "neurofunk"),
         BASS to listOf("dubstep", "riddim", "bass music", "future bass", "brostep", "breaks"),
         HIPHOP to listOf("hip", "rap", "r&b", "rnb", "trap", "grime", "drill", "boom bap", "soul"),
-        LATIN to listOf("latin", "reggaeton", "dembow", "salsa", "bachata", "afro", "amapiano", "baile", "reggae", "dancehall", "soca"),
+        AMAPIANO to listOf("amapiano", "piano", "kabza", "maphorisa", "kelvin momo", "log drum", "de mthuda", "focalistic", "vigro deep", "tyler icu", "tito m", "busta 929"),
+        GOSPEL to listOf("gospel", "worship", "praise", "christian", "choir", "hymn", "hillsong", "maverick city", "elevation worship", "bethel", "sinach", "nathaniel bassey", "benjamin dube", "joyous celebration", "lecrae", "limoblaze"),
+        LATIN to listOf("latin", "reggaeton", "dembow", "salsa", "bachata", "afro", "afrobeats", "baile", "reggae", "dancehall", "soca"),
         CHILL to listOf("chill", "ambient", "downtempo", "lofi", "lo-fi", "lounge", "jazz", "classical", "instrumental", "new age", "easy listening"),
         ROCK to listOf("rock", "metal", "punk", "indie", "grunge", "alternative", "country", "folk", "singer"),
         POP to listOf("pop", "dance", "edm", "electro", "big room", "electronic", "club") +
