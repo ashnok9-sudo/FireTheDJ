@@ -474,12 +474,10 @@ object TransitionPlanner {
                     if (!recipe.cut && mix > 0) {
                         if (!a.steadyIn(a.barTime(exit), a.barTime(exit + mix))) continue
                         if (!b.steadyIn(b.barTime(entry), b.barTime(entry + mix))) continue
-                        // Two singers at once is where a key clash is heard at once: never in
-                        // clashing keys, and best avoided even in matching ones. (A vocal swap and
-                        // a mashup take one voice out themselves.)
+                        // Two singers at once causes vocal collision, lyric clashing, and out-of-sync singing:
+                        // strictly forbid overlapping vocals unless using a voice-handling recipe (Vocal Swap, Mashup).
                         if (recipe !in VOICE_HANDLING && a.vocalIn(exit, exit + mix) >= SINGING && b.vocalIn(entry, entry + mix) >= SINGING) {
-                            if (!keysFit) continue
-                            voices = -BOTH_SINGING_COST
+                            continue
                         }
                     }
                     val score = recipeScore + exitScore(a, aEntryBar, exit, recipe, mix, skipped = skip != null) +
