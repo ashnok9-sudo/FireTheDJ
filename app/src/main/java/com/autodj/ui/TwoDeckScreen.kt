@@ -702,6 +702,13 @@ private fun VirtualDjPads(
             }
         }
 
+        val padLabels = when (activeMode) {
+            3 -> listOf("Air Horn", "Siren", "Explosion", "Applause")
+            1 -> listOf("1 Beat", "1/2 Beat", "1/4 Beat", "1/8 Beat")
+            2 -> listOf("Baby", "Chirp", "Flare", "Spinback")
+            else -> listOf("Pattern 1", "Pattern 2", "Pattern 3", "Pattern 4")
+        }
+
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
             for (p in 1..4) {
                 val isPActive = (live && chip != null && p == activePattern)
@@ -720,9 +727,9 @@ private fun VirtualDjPads(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        "Pattern $p",
+                        padLabels[p - 1],
                         color = if (isPActive) Color.White else Color(0xFFD4D4D8),
-                        fontSize = if (roomy) 10.sp else 8.sp,
+                        fontSize = if (roomy) 9.sp else 7.5.sp,
                         fontWeight = if (isPActive) FontWeight.ExtraBold else FontWeight.SemiBold,
                         maxLines = 1,
                     )
