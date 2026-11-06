@@ -71,9 +71,9 @@ object AnalysisJobs {
 
     /** Background-priority threads, so decoding never takes CPU from the screen or the decks. */
     private val cpu by lazy {
-        Executors.newFixedThreadPool(4) { job ->
+        Executors.newFixedThreadPool(2) { job ->
             Thread({
-                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)
+                Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
                 job.run()
             }, "analysis")
         }.asCoroutineDispatcher()
@@ -171,13 +171,13 @@ object AnalysisJobs {
         return ready.count { LyricsStore.get(it) != null } to ready.size
     }
 
-    /** How many songs may be analysed at once right now: never more than [PLAYING] while a set plays, none while stems separate. */
+    /** How many songs may be analysed at once right now: at most 1 while a set plays so playback never stutters. */
     private fun limit(): Int {
         // Stems for a coming mix come first: songs already started finish, no new ones start.
         if (com.autodj.dj.stems.StemJobs.busy) return 0
         val idle = _settings.value.songsAtOnce.takeIf { it > 0 } ?: maxIdle
         val s = EngineHolder.get(app).state.value
-        return if (s.running && !s.paused) minOf(PLAYING, idle) else idle
+        return if (s.running && !s.paused) 1 else idle
     }
 
     /**
