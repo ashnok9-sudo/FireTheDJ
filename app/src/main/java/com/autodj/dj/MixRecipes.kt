@@ -104,7 +104,8 @@ class BlendLength(val target: Int, val options: List<Int>) {
         fun of(family: String, mode: MixMode): BlendLength {
             val (target, options) = when (family) {
                 Genres.TECHNO -> 64 to listOf(64, 32, 16)
-                Genres.HOUSE, Genres.TRANCE -> 32 to listOf(32, 16, 8)
+                Genres.HOUSE, Genres.TRANCE, Genres.AMAPIANO -> 32 to listOf(32, 16, 8)
+                Genres.GOSPEL -> 16 to listOf(16, 8)
                 Genres.DNB, Genres.BASS, Genres.HIPHOP, Genres.ROCK -> 8 to listOf(8, 4)
                 else -> 16 to listOf(16, 8)
             }
@@ -150,6 +151,14 @@ object DecisionEngine {
         Genres.HIPHOP to mapOf(
             Recipe.SCRATCH_CUT to 2.6, Recipe.HARD_CUT to 2.4, Recipe.BACKSPIN_DROP to 2.2, Recipe.BRAKE_STOP to 2.0,
             Recipe.POWER_CUT to 1.8, Recipe.ECHO_OUT to 1.6, Recipe.LOFI_FADE to 1.6,
+        ),
+        Genres.AMAPIANO to mapOf(
+            Recipe.BASS_DROP to 3.2, Recipe.BASS_SWAP_BLEND to 2.8, Recipe.FILTER_FADE to 2.4,
+            Recipe.BREAKDOWN_SWAP to 2.0, Recipe.LOOP_MIX to 1.8, Recipe.ECHO_OUT to 1.6,
+        ),
+        Genres.GOSPEL to mapOf(
+            Recipe.REVERB_WASH to 3.2, Recipe.ECHO_OUT to 2.8, Recipe.VOCAL_SWAP to 2.4,
+            Recipe.BREAKDOWN_SWAP to 2.0, Recipe.BASS_SWAP_BLEND to 1.6, Recipe.FILTER_FADE to 1.4,
         ),
         Genres.LATIN to mapOf(
             Recipe.ECHO_OUT to 2.2, Recipe.REVERB_WASH to 2.2, Recipe.BASS_SWAP_BLEND to 2.0, Recipe.HARD_CUT to 2.0,
