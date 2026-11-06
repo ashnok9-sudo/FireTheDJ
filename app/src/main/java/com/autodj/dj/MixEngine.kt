@@ -217,7 +217,8 @@ class MixEngine(context: Context, private val scope: CoroutineScope) {
     private val _state = MutableStateFlow(EngineState())
     val state: StateFlow<EngineState> = _state
 
-    /** AI DJ voice announcements triggered during playback. */
+    /** AI DJ voice drops powered by SoundPool on media stream. */
+    val voiceDrop = VoiceDrop(appContext)
     var onVoiceEvent: ((FxType) -> Unit)? = null
     private var lastVoiceEvent: FxEvent? = null
 
@@ -294,7 +295,10 @@ class MixEngine(context: Context, private val scope: CoroutineScope) {
         beginTrack(decks[0], opener, opener.musicStartBar)
         refreshQueue(opener)
         // During a call the set is ready but waits, paused, instead of playing over it.
-        if (focus.request()) decks[0].player.play() else paused = true
+        if (focus.request()) {
+            decks[0].player.play()
+            voiceDrop.fireTheDJ()
+        } else paused = true
         loop = scope.launch {
             while (isActive) {
                 tick()
@@ -423,6 +427,7 @@ class MixEngine(context: Context, private val scope: CoroutineScope) {
     fun release() {
         stop()
         decks.forEach { it.release() }
+        voiceDrop.release()
     }
 
     /** Plans the tricks inside a track that has just become the main deck. */
@@ -495,6 +500,13 @@ class MixEngine(context: Context, private val scope: CoroutineScope) {
         if (voiceEv != null) {
             if (voiceEv !== lastVoiceEvent) {
                 lastVoiceEvent = voiceEv
+                when (voiceEv.type) {
+                    FxType.VOICE_ARE_YOU_READY -> voiceDrop.areYouReady()
+                    FxType.VOICE_FIRE_THE_DJ -> voiceDrop.fireTheDJ()
+                    FxType.VOICE_LETS_GO -> voiceDrop.letsGo()
+                    FxType.VOICE_PULL_UP -> voiceDrop.pullUp()
+                    else -> Unit
+                }
                 onVoiceEvent?.invoke(voiceEv.type)
             }
         } else {
