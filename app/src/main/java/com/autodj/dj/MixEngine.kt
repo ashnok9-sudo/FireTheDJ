@@ -334,6 +334,51 @@ class MixEngine(context: Context, private val scope: CoroutineScope) {
         publish()
     }
 
+    /**
+     * Fires one of the sampler pad sounds immediately on the main deck.
+     * [padIndex] 0-3 = pads 1-4. [mode] 0=BEATGRID, 1=ROLLS, 2=SCRATCH, 3=SAMPLER.
+     */
+    fun firePad(mode: Int, padIndex: Int) {
+        if (!_state.value.running) return
+        val deck = decks[main]
+        val pos = deck.positionSec
+        val beat = deck.track?.beatSec ?: 0.5
+        val endPos = pos + beat * 2  // 2-beat SFX burst
+
+        val fx = when (mode) {
+            3 -> when (padIndex) {  // SAMPLER
+                0 -> FxEvent(FxType.HORN, pos, endPos, 1f, 1f)
+                1 -> FxEvent(FxType.SIREN, pos, endPos, 0.8f, 1f, p1 = 4f)
+                2 -> FxEvent(FxType.EXPLOSION, pos, pos + beat, 1f, 1f)
+                3 -> FxEvent(FxType.APPLAUSE, pos, endPos, 0.9f, 0.9f)
+                else -> null
+            }
+            1 -> when (padIndex) {  // ROLLS
+                0 -> FxEvent(FxType.LOOP_ROLL, pos, pos + beat * 4, 1f, 1f, p1 = 1f)
+                1 -> FxEvent(FxType.LOOP_ROLL, pos, pos + beat * 2, 1f, 1f, p1 = 0.5f)
+                2 -> FxEvent(FxType.LOOP_ROLL, pos, pos + beat, 1f, 1f, p1 = 0.25f)
+                3 -> FxEvent(FxType.LOOP_ROLL, pos, pos + beat * 0.5, 1f, 1f, p1 = 0.125f)
+                else -> null
+            }
+            2 -> when (padIndex) {  // SCRATCH
+                0 -> FxEvent(FxType.SCRATCH, pos, pos + beat, 1f, 1f, p1 = 0.5f, p2 = 0.5f)
+                1 -> FxEvent(FxType.SCRATCH, pos, pos + beat, 1f, 1f, p1 = 0.25f, p2 = 0.25f)
+                2 -> FxEvent(FxType.SCRATCH, pos, pos + beat * 2, 1f, 1f, p1 = 0.5f, p2 = 0.25f)
+                3 -> FxEvent(FxType.BACKSPIN, pos, pos + beat * 2, 1f, 1f)
+                else -> null
+            }
+            else -> when (padIndex) {  // BEATGRID (0)
+                0 -> FxEvent(FxType.GATE, pos, pos + beat * 4, 1f, 1f, p1 = 1f, p2 = 1f)
+                1 -> FxEvent(FxType.GATE, pos, pos + beat * 2, 1f, 1f, p1 = 1f, p2 = 0.5f)
+                2 -> FxEvent(FxType.GATE, pos, pos + beat * 2, 1f, 1f, p1 = 1f, p2 = 0.25f)
+                3 -> FxEvent(FxType.GATE, pos, pos + beat, 1f, 1f, p1 = 1f, p2 = 0.125f)
+                else -> null
+            }
+        } ?: return
+
+        deck.plan = deck.plan.withEvents(listOf(fx))
+    }
+
     private fun setPaused(p: Boolean) {
         if (p == paused) return
         paused = p
