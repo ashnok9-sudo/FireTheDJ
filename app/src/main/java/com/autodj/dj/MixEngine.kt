@@ -217,6 +217,10 @@ class MixEngine(context: Context, private val scope: CoroutineScope) {
     private val _state = MutableStateFlow(EngineState())
     val state: StateFlow<EngineState> = _state
 
+    /** AI DJ voice announcements triggered during playback. */
+    var onVoiceEvent: ((FxType) -> Unit)? = null
+    private var lastVoiceEvent: FxEvent? = null
+
     /** Live position of the playing track, for the media session (state is only published per tick). */
     val positionSec: Double get() = decks[main].positionSec
 
@@ -485,6 +489,17 @@ class MixEngine(context: Context, private val scope: CoroutineScope) {
 
         val posA = a.positionSec
         val aEnded = a.player.playbackState == Player.STATE_ENDED
+
+        val voiceEv = a.plan.events.firstOrNull { it.type in VOICE_TYPES && it.isActive(posA) }
+            ?: (if (started) b.plan.events.firstOrNull { it.type in VOICE_TYPES && it.isActive(b.positionSec) } else null)
+        if (voiceEv != null) {
+            if (voiceEv !== lastVoiceEvent) {
+                lastVoiceEvent = voiceEv
+                onVoiceEvent?.invoke(voiceEv.type)
+            }
+        } else {
+            lastVoiceEvent = null
+        }
 
         // 0. Decide what plays next as soon as a track starts, so the listener can see it; the
         //    transition itself is planned once the track's own tricks (a hook replay) are done.
@@ -1012,6 +1027,7 @@ class MixEngine(context: Context, private val scope: CoroutineScope) {
     private fun frac(x: Double) = x - floor(x)
 
     private companion object {
+        val VOICE_TYPES = setOf(FxType.VOICE_ARE_YOU_READY, FxType.VOICE_FIRE_THE_DJ, FxType.VOICE_LETS_GO, FxType.VOICE_PULL_UP)
         /** The moves stems play on the real parts: a bass kill and the vocal cut and isolate (and any bass swap). */
         val STEM_MOVES = setOf(FxType.BASS_KILL, FxType.VOCAL_CUT, FxType.VOCAL_ISOLATE)
 
