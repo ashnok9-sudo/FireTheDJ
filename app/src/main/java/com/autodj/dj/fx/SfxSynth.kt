@@ -162,12 +162,12 @@ class SfxSynth(sampleRate: Int) {
                     // Sub-bass thump: membrane-style 55 Hz decaying fast + broadband noise burst
                     val thump = sin(2 * PI * 55 * x) * exp(-x * 6.0)
                     val crack = white() * exp(-x * 20.0)
-                    0.8 * thump + 0.4 * crack
+                    0.5 * thump + 0.25 * crack
                 }
                 FxType.APPLAUSE -> {
                     // Crowd applause: bandpass noise with fluttering amplitude simulating many hands
                     val flutter = 0.5 + 0.5 * sin(2 * PI * 7.0 * u)
-                    flutter * v.bandPass.process(white(), 0) * 1.4
+                    0.55 * flutter * v.bandPass.process(white(), 0)
                 }
                 FxType.VOICE_ARE_YOU_READY, FxType.VOICE_FIRE_THE_DJ, FxType.VOICE_LETS_GO, FxType.VOICE_PULL_UP -> 0.0
                 FxType.DAPPU, FxType.MARFA, FxType.DHOL, FxType.THAVIL, FxType.WHISTLE, FxType.TIMBALES, FxType.COWBELL,
