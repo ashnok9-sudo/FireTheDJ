@@ -333,13 +333,7 @@ class DjViewModel(app: Application) : AndroidViewModel(app), TrackSink {
     fun stop() = engine.stop()
     fun firePad(mode: Int, padIndex: Int) = engine.firePad(mode, padIndex)
 
-    private var _voiceDrop: VoiceDrop? = null
-    val voiceDrop: VoiceDrop get() = _voiceDrop ?: VoiceDrop(getApplication()).also { _voiceDrop = it }
-
-    override fun onCleared() {
-        super.onCleared()
-        _voiceDrop?.release()
-    }
+    val voiceDrop: VoiceDrop get() = engine.voiceDrop
 
     /**
      * Copies where each song stands from [AnalysisJobs] into the library. A song that has just
