@@ -113,6 +113,7 @@ class SfxSynth(sampleRate: Int) {
                 FxType.SHAKER -> 6500.0
                 FxType.CLAPS -> 1200.0
                 FxType.DARBUKA -> 3500.0
+                FxType.APPLAUSE -> 2000.0
                 else -> continue
             }
             val q = when (e.type) {
@@ -157,6 +158,18 @@ class SfxSynth(sampleRate: Int) {
                 FxType.DOWNLIFTER -> downlifter(v, u)
                 FxType.WHOOSH -> whoosh(v, u)
                 FxType.GUNSHOT -> gunshot(v, x % ((if (e.p1 > 0) e.p1 else 1f) * beatSec))
+                FxType.EXPLOSION -> {
+                    // Sub-bass thump: membrane-style 55 Hz decaying fast + broadband noise burst
+                    val thump = sin(2 * PI * 55 * x) * exp(-x * 6.0)
+                    val crack = white() * exp(-x * 20.0)
+                    0.8 * thump + 0.4 * crack
+                }
+                FxType.APPLAUSE -> {
+                    // Crowd applause: bandpass noise with fluttering amplitude simulating many hands
+                    val flutter = 0.5 + 0.5 * sin(2 * PI * 7.0 * u)
+                    flutter * v.bandPass.process(white(), 0) * 1.4
+                }
+                FxType.VOICE_ARE_YOU_READY, FxType.VOICE_FIRE_THE_DJ, FxType.VOICE_LETS_GO, FxType.VOICE_PULL_UP -> 0.0
                 FxType.DAPPU, FxType.MARFA, FxType.DHOL, FxType.THAVIL, FxType.WHISTLE, FxType.TIMBALES, FxType.COWBELL,
                 FxType.GUIRA, FxType.SHAKER, FxType.CLAPS, FxType.DARBUKA -> drum(v, e, x, beatSec)
                 FxType.NADASWARAM -> reed(v, x, left, beatSec, if (e.p1 > 0) e.p1.toDouble() else 330.0, if (e.p2 >= 1f) MINOR else MAJOR)
