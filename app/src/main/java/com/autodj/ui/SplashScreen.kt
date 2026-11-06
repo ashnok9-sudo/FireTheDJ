@@ -102,10 +102,11 @@ fun SplashScreen(tv: Boolean = false, onDone: () -> Unit) {
                 Column(
                     Modifier.graphicsLayer { alpha = text.value; translationY = (1 - text.value) * 24f },
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     FireTheDjWordmark(46.sp * k)
-                    Text("Your AI DJ for every party", color = Glass.Text, fontSize = 17.sp * k, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+                    Text("BY ASHLEY", color = Glass.EmberText, fontSize = 15.sp * k, fontWeight = FontWeight.ExtraBold, letterSpacing = 3.sp)
+                    Text("Your AI DJ for every party", color = Glass.Text, fontSize = 16.sp * k, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
                 }
             }
             Spacer(Modifier.weight(1f))
@@ -118,7 +119,7 @@ fun SplashScreen(tv: Boolean = false, onDone: () -> Unit) {
             ) {
                 Text("Made with passion", color = Glass.Muted, fontSize = 13.sp * k)
                 Icon(Icons.Filled.Favorite, "love", tint = Color(0xFFFF375F), modifier = Modifier.size(14.dp * k))
-                Text("by Surya", color = Glass.Muted, fontSize = 13.sp * k)
+                Text("by Ashley", color = Glass.Text, fontSize = 13.sp * k, fontWeight = FontWeight.Bold)
             }
         }
     }
