@@ -219,6 +219,15 @@ fun DjScreen(vm: DjViewModel) {
                                 state, artwork, visual = vm.engine::visual, onToggle = vm::togglePause, onStop = vm::stop, onSkip = vm::skip,
                                 onOpenEffects = { preview = true },
                                 languageOf = { uri -> library.firstOrNull { it.uri == uri }?.language },
+                                onPad = { mode, idx -> vm.firePad(mode, idx) },
+                                onVoiceDrop = { idx ->
+                                    when (idx) {
+                                        0 -> vm.voiceDrop.areYouReady()
+                                        1 -> vm.voiceDrop.fireTheDJ()
+                                        2 -> vm.voiceDrop.letsGo()
+                                        else -> vm.voiceDrop.pullUp()
+                                    }
+                                },
                             )
                         } else if (showMix) {
                             MixingScreen(state, artwork, visual = vm.engine::visual, onBack = {
