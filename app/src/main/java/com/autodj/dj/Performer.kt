@@ -92,6 +92,15 @@ object Performer {
         /** The beat alone for a bar (the voice and melody cut), everything back on the one. */
         MID_KILL("Mids out", false),
 
+        /** Beat alone: vocal cut so the instrumental groove plays solo. */
+        BEAT_ONLY("Beat only", false),
+
+        /** Vocal solo / acapella: vocal isolated and bass killed right into the drop. */
+        ACAPELLA_SOLO("Acapella solo", true),
+
+        /** Beatgrid stutter pattern on the downbeat. */
+        BEATGRID("Beatgrid pattern", false),
+
         /** A bar heard as if from the next room, opening up on the downbeat. */
         MUFFLE("Muffle", true),
 
@@ -153,18 +162,25 @@ object Performer {
      */
     private val FILLS: Map<String, List<Fill>> = mapOf(
         Genres.HIPHOP to listOf(
-            Fill.SCRATCH, Fill.ECHO_THROW, Fill.HORN, Fill.HALF_TIME, Fill.BRAKE, Fill.SCRATCH, Fill.GUNSHOT, Fill.SPINBACK, Fill.WHOOSH, Fill.ECHO_THROW, Fill.LASER,
+            Fill.SCRATCH, Fill.BEAT_ONLY, Fill.ECHO_THROW, Fill.HORN, Fill.HALF_TIME, Fill.BRAKE, Fill.ACAPELLA_SOLO,
+            Fill.SCRATCH, Fill.GUNSHOT, Fill.SPINBACK, Fill.BEATGRID, Fill.WHOOSH, Fill.ECHO_THROW, Fill.LASER,
+        ),
+        Genres.AMAPIANO to listOf(
+            Fill.SHAKER, Fill.WHISTLE, Fill.MID_KILL, Fill.BEAT_ONLY, Fill.AFRO_ECHO, Fill.ECHO_THROW, Fill.ROLL,
+        ),
+        Genres.GOSPEL to listOf(
+            Fill.ACAPELLA_SOLO, Fill.ECHO_THROW, Fill.REVERB_WASH, Fill.BEAT_ONLY,
         ),
         Genres.HOUSE to listOf(
-            Fill.ROLL, Fill.ECHO_THROW, Fill.MID_KILL, Fill.SWIRL, Fill.WHOOSH, Fill.HALF_TIME, Fill.CRASH, Fill.RISER_SWELL, Fill.GATE, Fill.MUFFLE,
-            Fill.ROLL, Fill.ECHO_THROW,
+            Fill.ROLL, Fill.ECHO_THROW, Fill.MID_KILL, Fill.BEAT_ONLY, Fill.SWIRL, Fill.WHOOSH, Fill.HALF_TIME,
+            Fill.CRASH, Fill.RISER_SWELL, Fill.GATE, Fill.ACAPELLA_SOLO, Fill.MUFFLE, Fill.ROLL, Fill.ECHO_THROW,
         ),
         Genres.TECHNO to listOf(Fill.GATE, Fill.MID_KILL, Fill.ROLL, Fill.CHAOS, Fill.ECHO_THROW, Fill.MUFFLE, Fill.SWIRL, Fill.ROLL, Fill.GATE),
         Genres.TRANCE to listOf(Fill.ROLL, Fill.RISER_SWELL, Fill.WHOOSH, Fill.MUFFLE, Fill.SWIRL, Fill.CRASH, Fill.ECHO_THROW, Fill.GATE),
         Genres.DNB to listOf(Fill.ROLL, Fill.HALF_TIME, Fill.CHAOS, Fill.ECHO_THROW, Fill.HORN, Fill.SPINBACK, Fill.LASER),
         Genres.BASS to listOf(Fill.LASER, Fill.HALF_TIME, Fill.CHAOS, Fill.ROLL, Fill.GUNSHOT, Fill.SPINBACK, Fill.ECHO_THROW, Fill.HORN),
         Genres.LATIN to listOf(Fill.HORN, Fill.AFRO_ECHO, Fill.ECHO_THROW, Fill.ROLL, Fill.RISER_SWELL, Fill.MUFFLE, Fill.WHOOSH, Fill.SPINBACK),
-        Genres.POP to listOf(Fill.ROLL, Fill.ECHO_THROW, Fill.MUFFLE, Fill.RISER_SWELL, Fill.WHOOSH, Fill.CRASH, Fill.GATE),
+        Genres.POP to listOf(Fill.ROLL, Fill.ACAPELLA_SOLO, Fill.ECHO_THROW, Fill.MUFFLE, Fill.BEAT_ONLY, Fill.RISER_SWELL, Fill.WHOOSH, Fill.CRASH, Fill.BEATGRID, Fill.GATE),
         Genres.CHILL to listOf(Fill.ECHO_THROW),
         Genres.ROCK to listOf(Fill.ECHO_THROW, Fill.CRASH, Fill.BRAKE),
     )
@@ -493,6 +509,13 @@ object Performer {
         Fill.GUNSHOT -> listOf(FxEvent(FxType.GUNSHOT, pe, pe + 2 * beat, level * 0.8f, level * 0.8f, p1 = 1f))
         Fill.CRASH -> listOf(FxEvent(FxType.CRASH, pe, pe + 2 * bar, level * 0.7f, level * 0.7f))
         Fill.MID_KILL -> listOf(FxEvent(FxType.MID_CUT, pe - bar, pe))
+        Fill.BEAT_ONLY -> listOf(FxEvent(FxType.VOCAL_CUT, pe - 2 * bar, pe, 0.95f, 0.95f))
+        Fill.ACAPELLA_SOLO -> listOf(
+            FxEvent(FxType.VOCAL_ISOLATE, pe - bar, pe, 0.95f, 0.95f),
+            FxEvent(FxType.BASS_KILL, pe - bar, pe, 1f, 1f),
+            FxEvent(FxType.REVERB, pe - bar, pe + bar, 0.2f, 0.5f, p1 = 2.0f),
+        )
+        Fill.BEATGRID -> listOf(FxEvent(FxType.GATE, pe - bar, pe, 1f, 1f, p1 = 0.125f))
         Fill.MUFFLE -> listOf(FxEvent(FxType.TREBLE_CUT, pe - bar, pe, 0.4f, 1f))
         // Played through the speed lane, not the effects.
         Fill.HALF_TIME -> emptyList()
