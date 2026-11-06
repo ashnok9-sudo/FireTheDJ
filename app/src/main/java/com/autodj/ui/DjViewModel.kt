@@ -136,6 +136,17 @@ class DjViewModel(app: Application) : AndroidViewModel(app), TrackSink {
         }
         // Rescan saved folders so songs added to them since last time show up.
         prefs.getString(KEY_FOLDERS, "").orEmpty().lines().filter { it.isNotBlank() }.forEach { scanFolder(Uri.parse(it)) }
+
+        // AI DJ autonomous voice drops: fire automatically at drop builds, set start, rewinds, and turnarounds.
+        engine.onVoiceEvent = { type ->
+            when (type) {
+                com.autodj.dj.fx.FxType.VOICE_ARE_YOU_READY -> voiceDrop.areYouReady()
+                com.autodj.dj.fx.FxType.VOICE_FIRE_THE_DJ -> voiceDrop.fireTheDJ()
+                com.autodj.dj.fx.FxType.VOICE_LETS_GO -> voiceDrop.letsGo()
+                com.autodj.dj.fx.FxType.VOICE_PULL_UP -> voiceDrop.pullUp()
+                else -> Unit
+            }
+        }
     }
 
     /** Adds every audio file in [tree] (and its subfolders), and keeps watching it on later launches. */
@@ -290,6 +301,7 @@ class DjViewModel(app: Application) : AndroidViewModel(app), TrackSink {
         SfxDressing.setLanguage = _setLanguage.value
         Log.i("AutoDJ", "set language: ${_setLanguage.value ?: "mixed"} (" + tracks.mapNotNull { languages[it.uri] }.groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.joinToString { "${it.key} ${it.value}" } + ")")
         engine.start(tracks, label, _mode.value)
+        voiceDrop.fireTheDJ()
         playingSet = PlayingSet(crate, folder?.uri, label)
     }
 
