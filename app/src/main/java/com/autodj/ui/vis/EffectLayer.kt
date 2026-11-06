@@ -375,7 +375,7 @@ class EffectLayer {
     companion object {
         private const val CALLOUT_SEC = 1.7f
         private val BUILDS = setOf(FxType.RISER, FxType.SNARE_ROLL, FxType.REVERSE_CYMBAL)
-        private val HOT = setOf(FxType.IMPACT, FxType.SUB_DROP, FxType.HORN, FxType.CRASH, FxType.GUNSHOT, FxType.DAPPU, FxType.MARFA, FxType.DHOL, FxType.THAVIL, FxType.TIMBALES, FxType.DARBUKA)
+        private val HOT = setOf(FxType.IMPACT, FxType.SUB_DROP, FxType.HORN, FxType.CRASH, FxType.GUNSHOT, FxType.DAPPU, FxType.MARFA, FxType.DHOL, FxType.THAVIL, FxType.TIMBALES, FxType.DARBUKA, FxType.EXPLOSION, FxType.VOICE_FIRE_THE_DJ)
         private val SIREN_RED = Color(0xFFFF2D4A)
         private val SIREN_BLUE = Color(0xFF2D6BFF)
         private val LASER_GREEN = Color(0xFF3DFF6E)
@@ -386,6 +386,9 @@ class EffectLayer {
             FxType.CRASH to Color.White, FxType.GUNSHOT to Color(0xFFFFE6A0), FxType.LASER to Color(0xFF3DFF6E),
             FxType.HIGH_PASS to Color(0xFF8FD0FF), FxType.LOW_PASS to Color(0xFF6FE0D0), FxType.RISER to Color(0xFFFFE1C2),
             FxType.SNARE_ROLL to Color(0xFFFFE1C2), FxType.REVERSE_CYMBAL to Color.White,
+            FxType.EXPLOSION to Color(0xFFFF4500), FxType.APPLAUSE to Color(0xFFFFD700),
+            FxType.VOICE_ARE_YOU_READY to Color(0xFFC084FC), FxType.VOICE_FIRE_THE_DJ to Color(0xFFFF5722),
+            FxType.VOICE_LETS_GO to Color(0xFF4ADE80), FxType.VOICE_PULL_UP to Color(0xFFFF3366),
             // The regional drums burn marigold; the reed glows warm.
             FxType.DAPPU to Color(0xFFFFB020), FxType.MARFA to Color(0xFFFFB020), FxType.DHOL to Color(0xFFFFB020),
             FxType.THAVIL to Color(0xFFFFD36B), FxType.NADASWARAM to Color(0xFFFFE6A0),
@@ -436,6 +439,12 @@ class EffectLayer {
             FxType.DOWNLIFTER -> "DOWN"
             FxType.WHOOSH -> "WHOOSH"
             FxType.GUNSHOT -> "PULL UP"
+            FxType.EXPLOSION -> "EXPLOSION"
+            FxType.APPLAUSE -> "APPLAUSE"
+            FxType.VOICE_ARE_YOU_READY -> "ARE YOU READY?!"
+            FxType.VOICE_FIRE_THE_DJ -> "FIRE THE DJ!"
+            FxType.VOICE_LETS_GO -> "LET'S GO!"
+            FxType.VOICE_PULL_UP -> "PULL UP!"
             FxType.MUTE -> "SILENCE"
             FxType.DAPPU -> "DAPPU"
             FxType.MARFA -> "MARFA"
