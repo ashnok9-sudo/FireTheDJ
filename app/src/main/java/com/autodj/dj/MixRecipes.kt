@@ -442,10 +442,15 @@ internal class RecipeBuilder(
             FxEvent(FxType.MID_CUT, mid, end, 0f, BLEND_MID_CUT),
             FxEvent(FxType.TREBLE_CUT, mid, end, 0f, BLEND_TREBLE_CUT),
         )
+        // Automatic vocal cut: if B enters with vocals, cut A's voice so two singers never clash.
+        val bEntryBar = b.barAt(entrySec)
+        val aVocalCut = if (b.vocalIn(bEntryBar, bEntryBar + mixBars) >= 0.35) {
+            listOf(FxEvent(FxType.VOCAL_CUT, e + bar, end, 0f, 1f))
+        } else emptyList()
         val aOut = aPlan(
             gain = aGain,
             bass = listOf(Ramp(mid - beat / 2, mid + beat / 2, 1f, 0f)),
-            events = aEvents + aEq,
+            events = aEvents + aEq + aVocalCut,
         )
         // B's lows are trimmed only at first, so its music is heard straight away; its mids wait
         // behind A's until the swap.
