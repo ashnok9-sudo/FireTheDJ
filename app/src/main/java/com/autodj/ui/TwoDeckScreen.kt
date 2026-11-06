@@ -199,7 +199,7 @@ private fun DeckPanel(
         }
         Column(Modifier.weight(1f).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically)) {
             // The record: live spectrum while the deck plays, the cover waiting while it's cued.
-            Box(Modifier.weight(1f, fill = false).size(if (roomy) 340.dp else 160.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.weight(1f, fill = false).size(if (roomy) 250.dp else 125.dp), contentAlignment = Alignment.Center) {
                 if (live) {
                     DjVisualizer(visual, artworkPath, track.uri, title, Modifier.fillMaxSize(), only = only, showLabels = false, glass = true)
                 } else {
@@ -219,13 +219,15 @@ private fun DeckPanel(
                     }
                 }
             }
-            Text(title, color = Glass.Text, fontSize = if (roomy) 26.sp else 17.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
-            Text(details, color = Glass.Muted, fontSize = if (roomy) 15.sp else 12.sp, maxLines = if (roomy) 2 else 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+            Text(title, color = Glass.Text, fontSize = if (roomy) 22.sp else 16.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+            Text(details, color = Glass.Muted, fontSize = if (roomy) 14.sp else 11.sp, maxLines = if (roomy) 2 else 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
             if (chip != null) {
-                Text(chip, color = AText, fontSize = if (roomy) 15.sp else 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                Text(chip, color = AText, fontSize = if (roomy) 14.sp else 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 2.dp).clip(RoundedCornerShape(12.dp)).background(Color(0x2EFF7A1A))
-                        .border(1.dp, Color(0xFFFF7A1A), RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 3.dp))
+                        .border(1.dp, Color(0xFFFF7A1A), RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 2.dp))
             }
+            Spacer(Modifier.height(3.dp))
+            VirtualDjPads(live = live, deckColor = color, chip = chip, roomy = roomy)
         }
         Overview(track, positionSec, markSec, color, live, if (roomy) 64.dp else 50.dp)
         val small = if (roomy) 15.sp else 12.sp
@@ -607,3 +609,126 @@ private fun HomeGlyph(color: Color) {
         drawPath(house, color, style = Stroke(w * 0.09f, cap = StrokeCap.Round, join = StrokeJoin.Round))
     }
 }
+
+/**
+ * VirtualDJ-style performance pads: BEATGRID, ROLLS, SCRATCH, SAMPLER with Pattern 1-4.
+ * Integrates with AI Performer active tricks (Acapella Solo, Beat Only, Scratch Cut, Gate)
+ * and allows interactive pad triggering.
+ */
+@Composable
+private fun VirtualDjPads(
+    live: Boolean,
+    deckColor: Color,
+    chip: String?,
+    roomy: Boolean = false,
+) {
+    val modes = listOf("BEATGRID", "ROLLS", "SCRATCH", "SAMPLER")
+    val chipUpper = chip?.uppercase().orEmpty()
+
+    val aiModeIndex = when {
+        "SCRATCH" in chipUpper || "STOP" in chipUpper || "SPIN" in chipUpper -> 2
+        "ROLL" in chipUpper || "ACAPELLA" in chipUpper || "BEAT" in chipUpper || "VOCAL" in chipUpper -> 1
+        "DROP" in chipUpper || "HORN" in chipUpper || "SFX" in chipUpper || "DOWNLIFTER" in chipUpper || "REVERB" in chipUpper -> 3
+        "GRID" in chipUpper || "GATE" in chipUpper || "STUTTER" in chipUpper -> 0
+        else -> 0
+    }
+
+    var selectedMode by remember { mutableStateOf(0) }
+    val activeMode = if (live && chip != null) aiModeIndex else selectedMode
+
+    val activePattern = if (live && chip != null) {
+        when {
+            "4" in chipUpper || "SOLO" in chipUpper -> 4
+            "3" in chipUpper || "ISOLATE" in chipUpper -> 3
+            "2" in chipUpper || "CUT" in chipUpper -> 2
+            else -> 1
+        }
+    } else 1
+
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
+            .background(Color(0xFF16171B).copy(alpha = 0.9f))
+            .border(1.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(8.dp))
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("PADS", color = Color(0xFF8E8E93), fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier.clip(RoundedCornerShape(3.dp))
+                        .background(if (live) Color(0xFF22C55E).copy(alpha = 0.25f) else Color.White.copy(alpha = 0.05f))
+                        .border(1.dp, if (live) Color(0xFF22C55E) else Color.White.copy(alpha = 0.1f), RoundedCornerShape(3.dp))
+                        .padding(horizontal = 4.dp, vertical = 1.dp),
+                ) {
+                    Text("SYNC", color = if (live) Color(0xFF4ADE80) else Color(0xFF71717A), fontSize = 8.sp, fontWeight = FontWeight.ExtraBold)
+                }
+                Text(
+                    if (live && chip != null) "AI ACTIVE" else "AUTO",
+                    color = if (live && chip != null) deckColor else Color(0xFF71717A),
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            modes.forEachIndexed { index, modeName ->
+                val isSelected = (index == activeMode)
+                Box(
+                    Modifier.weight(1f).height(if (roomy) 24.dp else 20.dp).clip(RoundedCornerShape(3.dp))
+                        .background(if (isSelected) Color(0xFF2E323B) else Color(0xFF1E2024))
+                        .border(
+                            1.dp,
+                            if (isSelected) Color.White.copy(alpha = 0.7f) else Color.White.copy(alpha = 0.1f),
+                            RoundedCornerShape(3.dp),
+                        )
+                        .clickable { selectedMode = index },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        modeName,
+                        color = if (isSelected) Color.White else Color(0xFF90929A),
+                        fontSize = if (roomy) 9.sp else 8.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        letterSpacing = 0.2.sp,
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            for (p in 1..4) {
+                val isPActive = (live && chip != null && p == activePattern)
+                val patBg = when {
+                    isPActive -> deckColor.copy(alpha = 0.35f)
+                    else -> Color(0xFF222428)
+                }
+                val patBorder = when {
+                    isPActive -> deckColor
+                    else -> Color.White.copy(alpha = 0.08f)
+                }
+                Box(
+                    Modifier.weight(1f).height(if (roomy) 26.dp else 22.dp).clip(RoundedCornerShape(3.dp))
+                        .background(patBg)
+                        .border(1.dp, patBorder, RoundedCornerShape(3.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        "Pattern $p",
+                        color = if (isPActive) Color.White else Color(0xFFD4D4D8),
+                        fontSize = if (roomy) 10.sp else 8.sp,
+                        fontWeight = if (isPActive) FontWeight.ExtraBold else FontWeight.SemiBold,
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+}
+
