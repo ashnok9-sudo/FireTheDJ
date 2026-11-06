@@ -20,6 +20,7 @@ import com.autodj.dj.MixEngine
 import com.autodj.dj.MixMode
 import com.autodj.dj.MixService
 import com.autodj.dj.SfxDressing
+import com.autodj.dj.VoiceDrop
 import com.autodj.model.TrackInfo
 import com.autodj.remote.ImportResult
 import com.autodj.remote.PlaylistImporter
@@ -318,6 +319,15 @@ class DjViewModel(app: Application) : AndroidViewModel(app), TrackSink {
     fun togglePause() = engine.togglePause()
     fun skip() = engine.skip()
     fun stop() = engine.stop()
+    fun firePad(mode: Int, padIndex: Int) = engine.firePad(mode, padIndex)
+
+    private var _voiceDrop: VoiceDrop? = null
+    val voiceDrop: VoiceDrop get() = _voiceDrop ?: VoiceDrop(getApplication()).also { _voiceDrop = it }
+
+    override fun onCleared() {
+        super.onCleared()
+        _voiceDrop?.release()
+    }
 
     /**
      * Copies where each song stands from [AnalysisJobs] into the library. A song that has just
