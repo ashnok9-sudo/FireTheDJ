@@ -109,6 +109,16 @@ enum class FxType(val label: String) {
     WHOOSH("Whoosh"),
     GUNSHOT("Gunshot"),
 
+    // DJ crowd hype sounds
+    EXPLOSION("Explosion"),
+    APPLAUSE("Applause"),
+
+    // Deep DJ voice drops (Android TTS with pitch processing)
+    VOICE_ARE_YOU_READY("Are You Ready?!"),
+    VOICE_FIRE_THE_DJ("Fire the DJ!"),
+    VOICE_LETS_GO("Let's Go!"),
+    VOICE_PULL_UP("Pull Up!"),
+
     // Indian regional percussion and reed (see [SfxSynth]).
     DAPPU("Dappu"),
     MARFA("Marfa"),
