@@ -58,10 +58,6 @@ object GenreClassifier {
             Genres.HIPHOP to max(trap(bpm, 72.0, 78.0, 102.0, 108.0), trap(bpm, 145.0, 155.0, 200.0, 210.0)) *
                 down(four, 0.55, 0.85) * (0.5 + 0.5 * up(f.kickSyncopation, 0.3, 0.7)) *
                 (0.6 + 0.4 * down(f.centroidHz, 2200.0, 3200.0)) * down(f.onsetRate, 4.0, 7.0),
-            Genres.AMAPIANO to trap(bpm, 108.0, 111.0, 116.0, 119.0) * up(four, 0.45, 0.8) *
-                (0.5 + 0.5 * up(f.lowRatio, 0.35, 0.55)),
-            Genres.GOSPEL to (max(trap(bpm, 60.0, 68.0, 85.0, 95.0), trap(bpm, 118.0, 122.0, 130.0, 135.0))) *
-                down(f.lowRatio, 0.45, 0.25) * (0.6 + 0.4 * down(f.onsetRate, 4.0, 6.0)),
             Genres.POP to trap(bpm, 90.0, 98.0, 130.0, 135.0) * (0.4 + 0.6 * bell(four, 0.5, 0.35)) *
                 (0.5 + 0.5 * up(f.centroidHz, 1800.0, 2800.0)),
             Genres.CHILL to down(f.onsetRate, 1.5, 3.5) * down(four, 0.4, 0.8),
