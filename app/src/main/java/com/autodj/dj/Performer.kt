@@ -286,8 +286,11 @@ object Performer {
             }
             // The first drop gets a bass boost to ride on for a phrase, easing back.
             if (n == 0) {
+                events += FxEvent(FxType.VOICE_ARE_YOU_READY, dSec - 2 * bar, dSec)
                 events += FxEvent(FxType.BASS_BOOST, dSec, dSec + 8 * bar, 1f, 0.3f, p1 = BOOST_DB)
                 tricks += Trick("Bass boost", dSec, dSec + 8 * bar)
+            } else {
+                events += FxEvent(FxType.VOICE_LETS_GO, dSec - bar, dSec)
             }
             val into = if (word != null) "Word loop “${word.text}”" else "Rising roll"
             val how = when (setup) {
@@ -325,6 +328,7 @@ object Performer {
         val replay = hookReplay ?: rewindBar?.let { d ->
             val jump = t.barTime(d + 8)
             events += FxEvent(FxType.BACKSPIN, jump - 2 * beat, jump, p1 = 3f)
+            events += FxEvent(FxType.VOICE_PULL_UP, jump - 2 * beat, jump)
             tricks += Trick("Rewind", jump - 2 * beat, jump + beat)
             Replay(atBar = d + 8, toBar = d, cut = true)
         }
