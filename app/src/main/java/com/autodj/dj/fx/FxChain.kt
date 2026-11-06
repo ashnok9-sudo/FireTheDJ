@@ -319,16 +319,16 @@ class FxChain(val sampleRate: Int, private val channels: Int) {
                         }
                         captured++
                     } else {
-                        // Authentic vinyl scratch with asymmetric hand velocity and crossfader chirp cuts.
+                        // Back then forward over the captured segment, like a hand on the record. It
+                        // starts where the audio is (the segment's end) at zero speed, and eases in
+                        // and out over the live track, which keeps playing softly underneath.
                         val u = ((capPos - captured) % stroke) / stroke
-                        val handCurve = if (u < 0.35) 1.0 - (u / 0.35).pow(1.5) else ((u - 0.35) / 0.65).pow(0.85)
-                        val pos = (captured - 1) * handCurve.coerceIn(0.0, 1.0)
-                        val faderCut = if (u in 0.16..0.32) 0.08f else 1.0f
+                        val pos = (captured - 1) * (0.5 + 0.5 * cos(2 * PI * u))
                         val scratchFrom = capEvent!!.start + captured / sr
                         val ramp = min((t - scratchFrom) / SCRATCH_FADE, (capEvent.end - t) / SCRATCH_FADE).coerceIn(0.0, 1.0)
                         val env = sin(ramp * PI / 2).toFloat()
                         val bed = 1f - env * (1f - SCRATCH_BED)
-                        for (c in 0 until channels) src[c] = buf[idx + c] * bed + readLinear(capture, captured, pos, c) * env * faderCut
+                        for (c in 0 until channels) src[c] = buf[idx + c] * bed + readLinear(capture, captured, pos, c) * env
                     }
                     capPos++
                 }
