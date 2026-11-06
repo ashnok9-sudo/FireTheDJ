@@ -61,6 +61,16 @@ object SfxDressing {
             builds = listOf(listOf(FxType.SIREN), listOf(FxType.RISER, FxType.REVERSE_CYMBAL), listOf(FxType.SIREN)),
             hits = listOf(listOf(FxType.HORN, FxType.IMPACT), listOf(FxType.GUNSHOT, FxType.SUB_DROP), listOf(FxType.HORN, FxType.CRASH)),
         ),
+        Genres.AMAPIANO to Palette(
+            builds = listOf(listOf(FxType.WHOOSH), listOf(FxType.REVERSE_CYMBAL), listOf(FxType.RISER)),
+            hits = listOf(listOf(FxType.SUB_DROP), listOf(FxType.SUB_DROP, FxType.IMPACT), listOf(FxType.DOWNLIFTER)),
+            level = 0.9f,
+        ),
+        Genres.GOSPEL to Palette(
+            builds = listOf(listOf(FxType.REVERSE_CYMBAL), listOf(FxType.WHOOSH)),
+            hits = listOf(listOf(FxType.REVERB), emptyList(), listOf(FxType.DOWNLIFTER)),
+            level = 0.6f,
+        ),
         Genres.LATIN to Palette(
             builds = listOf(listOf(FxType.SIREN), listOf(FxType.RISER, FxType.REVERSE_CYMBAL), listOf(FxType.WHOOSH)),
             hits = listOf(listOf(FxType.HORN, FxType.IMPACT), listOf(FxType.HORN, FxType.CRASH), listOf(FxType.IMPACT)),
