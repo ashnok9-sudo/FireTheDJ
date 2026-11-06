@@ -99,6 +99,8 @@ fun TwoDeckScreen(
     onOpenEffects: () -> Unit,
     languageOf: (String) -> String?,
     tv: TvDeckButtons? = null,
+    onPad: ((mode: Int, padIndex: Int) -> Unit)? = null,
+    onVoiceDrop: ((Int) -> Unit)? = null,
 ) {
     val deck = state.current
     val track = state.set.getOrNull(state.index)
@@ -127,6 +129,7 @@ fun TwoDeckScreen(
             chip = state.trickNow?.let { "Now: $it" } ?: state.trickNext?.let { "$it in ${formatTime(state.secondsToTrick ?: 0.0)}" },
             artworkPath = artwork[deck.uri], visual = visual, roomy = roomy,
             modifier = Modifier.weight(1f),
+            onPad = onPad, onVoiceDrop = onVoiceDrop,
         )
         MixerPanel(
             state, visual, artwork, coming, onToggle, onStop, onSkip, onOpenEffects, tv,
@@ -155,6 +158,7 @@ fun TwoDeckScreen(
                 chip = null,
                 artworkPath = artwork[next.uri], visual = visual, roomy = roomy,
                 modifier = Modifier.weight(1f),
+                onPad = onPad, onVoiceDrop = onVoiceDrop,
             )
         } else {
             Box(Modifier.weight(1f).fillMaxHeight().glass(RoundedCornerShape(20.dp)), contentAlignment = Alignment.Center) {
@@ -185,6 +189,8 @@ private fun DeckPanel(
     visual: () -> VisualFrame?,
     modifier: Modifier,
     roomy: Boolean = false,
+    onPad: ((mode: Int, padIndex: Int) -> Unit)? = null,
+    onVoiceDrop: ((Int) -> Unit)? = null,
 ) {
     Column(
         modifier.fillMaxHeight().clip(RoundedCornerShape(20.dp)).background(Color.White.copy(alpha = if (live) 0.07f else 0.04f))
@@ -227,7 +233,7 @@ private fun DeckPanel(
                         .border(1.dp, Color(0xFFFF7A1A), RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 2.dp))
             }
             Spacer(Modifier.height(3.dp))
-            VirtualDjPads(live = live, deckColor = color, chip = chip, roomy = roomy)
+            VirtualDjPads(live = live, deckColor = color, chip = chip, roomy = roomy, onPad = onPad, onVoiceDrop = onVoiceDrop)
         }
         Overview(track, positionSec, markSec, color, live, if (roomy) 64.dp else 50.dp)
         val small = if (roomy) 15.sp else 12.sp
@@ -621,6 +627,8 @@ private fun VirtualDjPads(
     deckColor: Color,
     chip: String?,
     roomy: Boolean = false,
+    onPad: ((mode: Int, padIndex: Int) -> Unit)? = null,
+    onVoiceDrop: ((Int) -> Unit)? = null,
 ) {
     val modes = listOf("BEATGRID", "ROLLS", "SCRATCH", "SAMPLER")
     val chipUpper = chip?.uppercase().orEmpty()
@@ -723,7 +731,8 @@ private fun VirtualDjPads(
                 Box(
                     Modifier.weight(1f).height(if (roomy) 26.dp else 22.dp).clip(RoundedCornerShape(3.dp))
                         .background(patBg)
-                        .border(1.dp, patBorder, RoundedCornerShape(3.dp)),
+                        .border(1.dp, patBorder, RoundedCornerShape(3.dp))
+                        .then(if (onPad != null) Modifier.clickable { onPad(activeMode, p - 1) } else Modifier),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -733,6 +742,30 @@ private fun VirtualDjPads(
                         fontWeight = if (isPActive) FontWeight.ExtraBold else FontWeight.SemiBold,
                         maxLines = 1,
                     )
+                }
+            }
+        }
+
+        // 🎙 DJ Voice drop buttons — always visible at the bottom of the pads panel
+        if (onVoiceDrop != null) {
+            val voiceLabels = listOf("ARE YOU READY?!", "FIRE THE DJ!", "LET'S GO!", "PULL UP!")
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                voiceLabels.forEachIndexed { idx, label ->
+                    Box(
+                        Modifier.weight(1f).height(if (roomy) 20.dp else 17.dp).clip(RoundedCornerShape(3.dp))
+                            .background(Color(0xFF1A1230))
+                            .border(1.dp, Color(0xFF7C3AED).copy(alpha = 0.7f), RoundedCornerShape(3.dp))
+                            .clickable { onVoiceDrop(idx) },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            label,
+                            color = Color(0xFFDDD6FE),
+                            fontSize = 5.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
         }
