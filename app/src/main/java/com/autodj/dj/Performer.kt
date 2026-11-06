@@ -169,7 +169,7 @@ object Performer {
             Fill.SHAKER, Fill.WHISTLE, Fill.MID_KILL, Fill.BEAT_ONLY, Fill.AFRO_ECHO, Fill.ECHO_THROW, Fill.ROLL,
         ),
         Genres.GOSPEL to listOf(
-            Fill.ACAPELLA_SOLO, Fill.ECHO_THROW, Fill.REVERB_WASH, Fill.BEAT_ONLY,
+            Fill.ACAPELLA_SOLO, Fill.ECHO_THROW, Fill.SWIRL, Fill.BEAT_ONLY,
         ),
         Genres.HOUSE to listOf(
             Fill.ROLL, Fill.ECHO_THROW, Fill.MID_KILL, Fill.BEAT_ONLY, Fill.SWIRL, Fill.WHOOSH, Fill.HALF_TIME,
