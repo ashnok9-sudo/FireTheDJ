@@ -55,6 +55,7 @@ android {
         create("tv") {
             dimension = "device"
             applicationIdSuffix = ".tv"
+            ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
         }
     }
 
